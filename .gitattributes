@@ -1,0 +1,8 @@
+# Tell GitHub Linguist what to count
+*.lean linguist-language=Lean
+*.py linguist-language=Python
+
+# Exclude generated/vendored files from language stats
+lean/.lake/** linguist-vendored
+lean/lake-manifest.json linguist-generated
+lean/lean-toolchain linguist-documentation
