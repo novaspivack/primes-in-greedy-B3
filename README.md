@@ -81,12 +81,53 @@ The single `sorry` in `prime_preserves_B3` is **not a gap in the mathematical ar
 
 This result does not appear in the [OEIS entry for A079852](https://oeis.org/A079852) as of March 2026. The entry's only comment (Greathouse, 2015) notes that 210 is in the sequence but 330 is not, showing the sequence isn't determined by prime signature alone.
 
+## Extended Analysis: The Additive-Multiplicative Asymmetry
+
+The greedy *additive* B₃ sequence (where all triple *sums* must be distinct) tells the opposite story. Out of 669 primes up to 5,000, only **3** appear in the additive B₃ sequence (13, 71, 2441). That's 0.4%, and falling.
+
+| | Multiplicative B₃ | Additive B₃ |
+|---|---|---|
+| Primes included (up to 5,000) | **669 / 669 (100%)** | 3 / 669 (0.4%) |
+| Composites included | 9 | 13 |
+| Total terms | 679 | 16 |
+
+In the multiplicative world, primes are "orthogonal" — each generates an independent direction in the factorization lattice. No prime can collide with products of smaller numbers.
+
+In the additive world, primes are entangled — their sums overlap freely with sums of other numbers. The additive structure of primes is rich and complex (Goldbach, Vinogradov, etc.), creating abundant collisions that block almost all primes.
+
+This is a concrete, computable manifestation of the fundamental asymmetry between additive and multiplicative number theory — the same asymmetry that makes Goldbach's conjecture hard while unique factorization is easy.
+
+### The Composites That Sneak In
+
+The 13 composites admitted to multiplicative B₃ up to 10,000 are:
+
+| Value | Factorization | Notes |
+|-------|---------------|-------|
+| 16 | 2⁴ | Prime power |
+| 54 | 2 × 3³ | |
+| 250 | 2 × 5³ | |
+| 360 | 2³ × 3² × 5 | |
+| 588 | 2² × 3 × 7² | |
+| 1155 | 3 × 5 × 7 × 11 | Squarefree, 4 prime factors |
+| 2366 | 2 × 7 × 13² | |
+| 2420 | 2² × 5 × 11² | |
+| 2925 | 3² × 5² × 13 | |
+| 5632 | 2⁹ × 11 | |
+| 5831 | 7³ × 17 | |
+| 6561 | 3⁸ | Prime power |
+| 9826 | 2 × 17³ | |
+
+No two composites share the same factorization signature. The B₂ (Sidon) greedy sequence admits 106 composites in the same range — far more than B₃'s 13. Remarkably, the B₂ and B₃ composite sets are completely disjoint: no composite appears in both greedy sequences.
+
+See [`analysis.py`](analysis.py) for the full analysis code.
+
 ## Files
 
 | File | Description |
 |------|-------------|
 | [`lean/B3Primes.lean`](lean/B3Primes.lean) | Lean 4 formalization (no Mathlib required) |
 | [`verify.py`](verify.py) | Computational verification to 10,000 |
+| [`analysis.py`](analysis.py) | Extended analysis: composites, B₂ vs B₃, additive vs multiplicative |
 | [`README.md`](README.md) | This file |
 
 ## License
