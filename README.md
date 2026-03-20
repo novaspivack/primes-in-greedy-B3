@@ -51,31 +51,33 @@ See [`verify.py`](verify.py) for the verification code.
 
 ## Lean 4 Formalization
 
-The key sub-theorem — that a triple product involving p cannot equal a triple product of elements all less than p — is fully proved in Lean 4 with no `sorry`:
+The main theorem is fully proved in Lean 4 with **zero `sorry` and zero custom axioms**:
 
 ```lean
-theorem no_cross_collision
-    (p : Nat) (hp : Prime p)
-    (a b d e f : Nat)
-    (hd : 0 < d) (he : 0 < e) (hf : 0 < f)
-    (hd' : d < p) (he' : e < p) (hf' : f < p) :
-    a * b * p ≠ d * e * f
+theorem prime_preserves_B3
+    (p : ℕ) (hp : Nat.Prime p)
+    (S : ℕ → Prop)
+    (hB3 : IsMultB3 S)
+    (hpos : ∀ s, S s → 0 < s)
+    (hlt  : ∀ s, S s → s < p)
+    (hone : S 1) :
+    IsMultB3 (aug S p)
 ```
 
-The full formalization is in [`lean/B3Primes.lean`](lean/B3Primes.lean). Status of each component:
+The full formalization is in [`lean/B3Primes.lean`](lean/B3Primes.lean). It uses Mathlib for `Nat.Prime.dvd_mul` (Euclid's lemma). All components:
 
 | Component | Status | Notes |
 |-----------|--------|-------|
 | `not_dvd_of_pos_lt` | ✅ Proved | 0 < m < p → ¬(p ∣ m) |
-| `prime_not_dvd_mul` | ✅ Proved | From Euclid's lemma |
+| `prime_not_dvd_mul` | ✅ Proved | From `Nat.Prime.dvd_mul` (Mathlib) |
 | `prime_not_dvd_mul3` | ✅ Proved | Extended to three factors |
-| `no_triple_product_dvd_of_all_lt` | ✅ Proved | All factors < p → p ∤ a·b·c |
-| `no_cross_collision` | ✅ Proved | **Case 2: a·b·p ≠ d·e·f when d,e,f < p** |
-| `mul_right_cancel` | ✅ Proved | **Case 3 setup: a·b·p = d·e·p → a·b = d·e** |
-| `euclid_lemma` | 📐 Axiom | Standard (needs Bézout to prove from scratch) |
-| `prime_preserves_B3` | 📝 `sorry` | Case-split bookkeeping only (see below) |
+| `no_triple_dvd_of_all_lt` | ✅ Proved | All factors < p → p ∤ a·b·c |
+| `p_not_dvd_S_triple` | ✅ Proved | p doesn't divide any S-element triple |
+| `prime_preserves_B3` | ✅ **Proved** | **Complete. Zero sorry. Zero axioms.** |
 
-The single `sorry` in `prime_preserves_B3` is **not a gap in the mathematical argument**. The theorem's proof has three cases; all three are fully proved as standalone theorems above it. The `sorry` covers only the mechanical Lean bookkeeping of a 64-way case split (each of six elements is either in S or equals p) that dispatches each case to the appropriate proved theorem. The mathematical content is complete.
+The proof uses a 4×4 case structure on the number of p's appearing on each side of a collision (0, 1, 2, or 3), rather than a flat 64-way split. Each case either reduces to the B₃ property of S, a divisibility contradiction via Euclid's lemma, or a cancellation argument.
+
+**Requirements:** Lean 4.29.0-rc3, Mathlib v4.29.0-rc3. Run `lake build` in the `lean/` directory.
 
 ## OEIS
 
@@ -125,7 +127,8 @@ See [`analysis.py`](analysis.py) for the full analysis code.
 
 | File | Description |
 |------|-------------|
-| [`lean/B3Primes.lean`](lean/B3Primes.lean) | Lean 4 formalization (no Mathlib required) |
+| [`lean/B3Primes.lean`](lean/B3Primes.lean) | Lean 4 formalization (zero sorry, zero axioms; requires Mathlib) |
+| [`lean/lakefile.lean`](lean/lakefile.lean) | Lake build file (Mathlib dependency) |
 | [`verify.py`](verify.py) | Computational verification to 10,000 |
 | [`analysis.py`](analysis.py) | Extended analysis: composites, B₂ vs B₃, additive vs multiplicative |
 | [`README.md`](README.md) | This file |
